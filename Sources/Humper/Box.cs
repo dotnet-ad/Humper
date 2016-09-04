@@ -100,7 +100,7 @@ namespace Humper
 
 		#endregion
 
-		public Movement Move(float x, float y, Func<ICollision, ICollisionResponse> filter)
+		public IMovement Move(float x, float y, Func<ICollision, ICollisionResponse> filter)
 		{
 			var movement = world.Simulate(this, x, y, filter);
 
@@ -110,7 +110,7 @@ namespace Humper
 			return movement;
 		}
 
-		public Movement Move(float x, float y, Func<ICollision, CollisionResponses> filter)
+		public IMovement Move(float x, float y, Func<ICollision, CollisionResponses> filter)
 		{
 			return Move(x, y, (col) =>
 			  {
