@@ -2,13 +2,13 @@
 
 Collision detection only for **Axis-Aligned-Bounding-Boxes** (*aka AABB*).
 
-This library isn't a fully featured physics engine : don't expect a realistic physics simulation but it could be enough for basic game physics (platformer games, top-down games, shoot-em-ups). 
+This library isn't a fully featured physics engine : don't expect a realistic physics simulation but it could be enough for basic game physics (platformer games, top-down games, shoot-em-ups). Though, Humper has spatial hashing for better performances and all the necessary moving and collision test tools needed for building a 2D game.
 
 The library doesn't rely on any particular framework, its pure C# with all needed types included. It is fairly easy to integrate with existing frameworks like [Monogame](http://www.monogame.net/).
 
 ## Install
 
-Available soon on NuGet
+Available on NuGet
 
 [![NuGet](https://img.shields.io/nuget/v/Humper.svg?label=NuGet)](https://www.nuget.org/packages/Humper/)
 
@@ -37,7 +37,7 @@ if(result.HasCollided)
 
 ## Basic APIs
 
-### World
+### IWorld
 
 The world is a virtual representation of your physics environnement. It manages all bodies and have a given size.
 
@@ -45,17 +45,29 @@ The world is subdivided in cells of `64` by default to faster collision calculat
 
 #### `IBox Create(float x, float y, float width, float height)`
 
-Creates a new box with given coordinates and size.
+Create a new box in the world.
 
 #### `bool Remove(IBox box)`
 
-Removes a box from the world.
+Remove the specified box from the world.
 
 #### `IBox Find(float x, float y, float width, float height)`
 
-Queries the world to find all boxes in a given area.
+Find the boxes contained in the given area of the world.
 
-### Box
+#### `IHit Hit(Vector2 point, IEnumerable<IBox> ignoring = null)`
+
+Queries the world to find the nearest colliding point from a given position.
+
+#### `IHit Hit(Vector2 origin, Vector2 destination, IEnumerable<IBox> ignoring = null)`
+
+Queries the world to find the nearest colliding position from an oriented segment.
+
+#### `IHit Hit(RectangleF origin, RectangleF destination, IEnumerable<IBox> ignoring = null)`
+
+Queries the world to find the nearest colliding position from a moving rectangle.
+ 
+### IBox
 
 A box represents any object of your physical world as an Axis-Aligned-Bounding-Boxes (*a rectangle that cannot be rotated*).
 
@@ -79,13 +91,17 @@ The width of the box.
 
 Triggers a movement of the box in the physical world from its current position to the given one. The filters should indicate how the box reacts when colliding with another box of the world (see `Responses` section for more info).
 
+#### `IMovement Simulate(float x, float y, Func<ICollision, ICollisionResponse> filter)`
+
+Simulates the move of the box to the specified coordinates with collisition simulation (the boxe's position isn't altered at all).
+
 #### `IBox AddTags(params Enum[] newTags)`
 
-Add enumeration flags to be categorized.
+Add enumeration flags to the box.
 
 #### `bool HasTag(params Enum[] values)`
 
-Indicates whether the box has one of the given tags.
+Indicates whether the box has at least one of the given tags.
 
 #### `bool HasTags(params Enum[] values)`
 
@@ -95,53 +111,49 @@ Indicates whether the box has all of the given tags.
 
 Custom user data that can be attached to the box.
 
-### Collision
+### ICollision
 
-A collision represents the result of a movement query that resulted in a collision.
+A collision represents the result of a movement query that resulted in a collision and that need to be resolved to a response.
 
-#### `IBox Box { get; set; }`
+#### `IBox Box { get; }`
 
 The box that moved.
 
-#### `IBox Other { get; set; }`
+#### `IBox Other { get; }`
 
-The box that have collided with the moving box.
+The other box than being collided by the moving box.
 
-#### `RectangleF Origin { get; set; }`
+#### `RectangleF Origin { get; }`
 
 The starting position of the moving box.
 
-#### `RectangleF Goal { get; set; }`
+#### `RectangleF Goal { get; }`
 
-The queried destination.
+The intialy requested goal destination for the moving box.
 
-#### `Hit Hit { get; set; }`
+#### `Hit Hit { get; }`
 
-Information about the collision point.
+Gets information about the impact point.
 
-#### `bool HasCollided { get; }`
+### IHit
 
-Indicates whether this collision is valid.
-
-### Hit
-
-An hit point represents the impact of one box with an other.
+An hit point represents the impact with a box of the world.
 
 #### `Vector2 Normal { get; set; }`
 
-The normal vector of the collided side.
+The normal vector of the collided box side.
 
 #### `float Amount { get; set; }`
 
-The amount of movement accomplished from origin to impact, compared to goal destination.
+The amount of movement needed from origin to get the impact position.
 
 #### `RectangleF Position { get; set; }`
 
-The impact position of the box.
+The impact position.
 
 #### `float Remaining { get; }`
 
-The remaining amount of movement to go from the impact to goal destination.
+The amount of movement needed from impact position to get the requested initial goal position.
 
 ### Responses
 
@@ -193,6 +205,8 @@ protected override void Draw(GameTime gameTime)
 ```
 
 ## Samples
+
+![Video](./Documentation/Samples.gif)
 
 Check the samples if you wish to implement a :
 

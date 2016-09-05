@@ -6,7 +6,7 @@
 	{
 		public TouchResponse(ICollision collision)
 		{
-			this.Destination = collision.Hit.Position;
+			this.Destination = new RectangleF(collision.Hit.Position, collision.Goal.Size);
 		}
 
 		public RectangleF Destination { get; private set; }

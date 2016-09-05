@@ -3,7 +3,7 @@ namespace Humper.Base
 {
 	public static class Constants
 	{
-		public const float Epsilon = 0.00001f;
+		public const float Threshold = 0.00001f;
 	}
 }
 

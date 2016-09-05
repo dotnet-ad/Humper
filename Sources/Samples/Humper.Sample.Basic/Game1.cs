@@ -44,6 +44,7 @@ namespace Humper.Sample.Basic
 		{ 
 			typeof(TopdownScene),
 			typeof(PlatformerScene),
+			typeof(ParticlesScene),
 		};
 
 		private int sceneIndex = -1;
@@ -109,6 +110,8 @@ namespace Humper.Sample.Basic
 				color = Color.Red;
 			else if (box.HasTag(Tags.Group4))
 				color = Color.Green;
+			else if (box.HasTag(Tags.Group5))
+				color = Color.Yellow;
 			else
 				color = new Color(165, 155, 250);
 

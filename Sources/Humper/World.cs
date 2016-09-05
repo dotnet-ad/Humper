@@ -2,10 +2,11 @@
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using Base;
 	using Responses;
 
-	public class World
+	public class World : IWorld
 	{
 		public World(float width, float height, float cellSize = 64)
 		{
@@ -30,6 +31,9 @@
 
 		public IEnumerable<IBox> Find(float x, float y, float w, float h)
 		{
+			x = Math.Max(0, Math.Min(x, this.Bounds.Right - w));
+			y = Math.Max(0, Math.Min(y, this.Bounds.Bottom - h));
+
 			return this.grid.QueryBoxes(x, y, w, h);
 		}
 
@@ -50,67 +54,124 @@
 
 		#endregion
 
-		#region Physics
+		#region Hits
+
+		public IHit Hit(Vector2 point, IEnumerable<IBox> ignoring = null)
+		{
+			var boxes = this.Find(point.X, point.Y, 0, 0);
+
+			if (ignoring != null)
+			{
+				boxes = boxes.Except(ignoring);
+			}
+
+			foreach (var other in boxes)
+			{
+				var hit = Humper.Hit.Resolve(point, other);
+
+				if (hit != null)
+				{
+					return hit;
+				}
+			}
+
+			return null;
+		}
+
+		public IHit Hit(Vector2 origin, Vector2 destination, IEnumerable<IBox> ignoring = null)
+		{
+			var min = Vector2.Min(origin, destination);
+			var max = Vector2.Max(origin, destination);
+
+			var wrap = new RectangleF(min, max - min);
+			var boxes = this.Find(wrap.X, wrap.Y, wrap.Width, wrap.Height);
+
+			if (ignoring != null)
+			{
+				boxes = boxes.Except(ignoring);
+			}
+
+			IHit nearest = null;
+
+			foreach (var other in boxes)
+			{
+				var hit = Humper.Hit.Resolve(origin, destination, other);
+
+				if (hit != null && (nearest == null || hit.IsNearest(nearest,origin)))
+				{
+					nearest = hit;
+				}
+			}
+
+			return nearest;
+		}
+
+		public IHit Hit(RectangleF origin, RectangleF destination, IEnumerable<IBox> ignoring = null)
+		{
+			var wrap = new RectangleF(origin, destination);
+			var boxes = this.Find(wrap.X, wrap.Y, wrap.Width, wrap.Height);
+
+			if (ignoring != null)
+			{
+				boxes = boxes.Except(ignoring);
+			}
+
+			IHit nearest = null;
+
+			foreach (var other in boxes)
+			{
+				var hit = Humper.Hit.Resolve(origin, destination, other);
+
+				if (hit != null && (nearest == null || hit.IsNearest(nearest, origin.Location)))
+				{
+					nearest = hit;
+				}
+			}
+
+			return nearest;
+		}
+
+		#endregion
+
+		#region Movements
 
 		public IMovement Simulate(Box box, float x, float y, Func<ICollision, ICollisionResponse> filter)
 		{
-			x = Math.Max(0, Math.Min(x, this.Bounds.Right - box.Width));
-			y = Math.Max(0, Math.Min(y, this.Bounds.Bottom - box.Height));
-
 			var origin = box.Bounds;
-			var destination = new RectangleF(new Vector2(x, y), box.Bounds.Size);
+			var destination = new RectangleF(x, y, box.Width, box.Height);
+
+			var hits = new List<IHit>();
 
 			var result = new Movement()
 			{
 				Origin = origin,
-				Destination = destination,
+				Destination = this.Simulate(hits, new List<IBox>() { box }, box, origin, destination, filter),
+				Hits = hits,
 			};
-
-			var wrap = new RectangleF(origin, destination);
-			var boxes = this.grid.QueryBoxes(wrap.X, wrap.Y, wrap.Width, wrap.Height);
-
-			Hit nearest = null;
-			IBox nearestOther = null;
-
-			foreach (var other in boxes)
-			{
-				if (other != box)
-				{
-					var hit = Hit.ResolveWithBroadphasing(origin, destination, other.Bounds);
-					if (hit != null && (nearest == null || nearest.Amount > hit.Amount))
-					{
-						nearest = hit;
-						nearestOther = other;
-					}
-				}
-			}
-
-			var collision = new Collision()
-			{
-				Box = box,
-				Hit = nearest,
-				Other = nearestOther,
-				Origin = box.Bounds,
-				Goal = new RectangleF(x, y, box.Width, box.Height),
-			};
-
-			result.Destination = destination;
-
-			if (collision.HasCollided)
-			{
-				var collisions = new List<ICollision>() { collision };
-				var response = filter(collision);
-				if (response != null && result.Destination != response.Destination)
-				{
-					result.Destination = response.Destination;
-					var nextMovement = this.Simulate(box, result.Destination.X, result.Destination.Y, filter);
-					result.Destination = nextMovement.Destination;
-					collisions.AddRange(nextMovement.Collisions);
-				}
-				result.Collisions = collisions;
-			}
 
 			return result;
+		}
+
+		private RectangleF Simulate(List<IHit> hits, List<IBox> ignoring, Box box, RectangleF origin, RectangleF destination, Func<ICollision, ICollisionResponse> filter)
+		{
+			var nearest = this.Hit(origin, destination, ignoring);
+				
+			if (nearest != null)
+			{
+				hits.Add(nearest);
+
+				var impact = new RectangleF(nearest.Position, origin.Size);
+				var collision = new Collision() { Box = box, Hit = nearest, Goal = destination, Origin = origin };
+				var response = filter(collision);
+
+				if (response != null && destination != response.Destination)
+				{
+					ignoring.Add(nearest.Box);
+					return this.Simulate(hits, ignoring, box, impact, response.Destination, filter);
+				}
+			}
+
+			return destination;
 		}
 
 		#endregion
@@ -138,7 +199,6 @@
 		}
 
 		#endregion
-
 	}
 }
 

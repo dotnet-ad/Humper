@@ -5,7 +5,7 @@
 
 	public interface IMovement
 	{
-		IEnumerable<ICollision> Collisions { get; }
+		IEnumerable<IHit> Hits { get; }
 
 		bool HasCollided { get; }
 
