@@ -330,10 +330,10 @@
 		{
 			if (entry.X > entry.Y)
 			{
-				return (invEntry.X < 0.0f) ? Vector2.UnitX : -Vector2.UnitX;
+				return (invEntry.X <= 0.0f) ? Vector2.UnitX : -Vector2.UnitX;
 			}
 
-			return (invEntry.Y < 0.0f) ? Vector2.UnitY : -Vector2.UnitY;
+			return (invEntry.Y <= 0.0f) ? Vector2.UnitY : -Vector2.UnitY;
 		}
 				                            
 
