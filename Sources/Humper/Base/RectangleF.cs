@@ -299,8 +299,8 @@ namespace Humper.Base
 		/// <returns><c>true</c> if other <see cref="RectangleF"/> intersects with this rectangle; <c>false</c> otherwise.</returns>
 		public bool Intersects(RectangleF value)
 		{
-			return value.Left < Right && Left < value.Right &&
-				   value.Top < Bottom && Top < value.Bottom;
+			return value.Left <= Right && Left < value.Right &&
+				   value.Top <= Bottom && Top < value.Bottom;
 		}
 
 
@@ -311,8 +311,8 @@ namespace Humper.Base
 		/// <param name="result"><c>true</c> if other <see cref="RectangleF"/> intersects with this rectangle; <c>false</c> otherwise. As an output parameter.</param>
 		public void Intersects(ref RectangleF value, out bool result)
 		{
-			result = value.Left < Right && Left < value.Right &&
-					 value.Top < Bottom && Top < value.Bottom;
+			result = value.Left <= Right && Left < value.Right &&
+					 value.Top <= Bottom && Top < value.Bottom;
 		}
 
 		/// <summary>
