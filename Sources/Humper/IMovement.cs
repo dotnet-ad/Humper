@@ -11,6 +11,8 @@
 
 		RectangleF Origin { get; }
 
+		RectangleF Goal { get; }
+
 		RectangleF Destination { get; }
 	}
 }
