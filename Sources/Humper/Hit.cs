@@ -37,7 +37,7 @@
 			return result;
 		}
 
-		private static Hit Resolve(RectangleF origin, RectangleF destination, RectangleF other)
+		public static Hit Resolve(RectangleF origin, RectangleF destination, RectangleF other)
 		{
 			var broadphaseArea = RectangleF.Union(origin,destination);
 
@@ -49,7 +49,7 @@
 			return null;
 		}
 
-		private static Hit Resolve(Vector2 origin, Vector2 destination, RectangleF other)
+		public static Hit Resolve(Vector2 origin, Vector2 destination, RectangleF other)
 		{
 			var min = Vector2.Min(origin,destination);
 			var size = Vector2.Max(origin, destination) - min;
@@ -160,7 +160,13 @@
 			// if starts inside, push it outside at the neareast place
 			if (other.Contains(origin) || other.Intersects(origin))
 			{
-				origin = PushOutside(origin, other).Item1;
+				var outside = PushOutside(origin, other);
+				return new Hit()
+				{
+					Amount = 0,
+					Position = outside.Item1.Location,
+					Normal = outside.Item2,
+				};
 			}
 
 			var velocity = (destination.Location - origin.Location);
@@ -234,12 +240,19 @@
 
 			return result;
 		}
+
 		private static Hit ResolveNarrow(Vector2 origin, Vector2 destination, RectangleF other)
 		{
 			// if starts inside, push it outside at the neareast place
 			if (other.Contains(origin))
 			{
-				origin = PushOutside(origin, other).Item1;
+				var outside = PushOutside(origin, other);
+				return new Hit()
+				{
+					Amount = 0,
+					Position = outside.Item1,
+					Normal = outside.Item2,
+				};
 			}
 
 			var velocity = (destination - origin);

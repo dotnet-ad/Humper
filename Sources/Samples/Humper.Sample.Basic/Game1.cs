@@ -32,8 +32,6 @@ namespace Humper.Sample.Basic
 		{
 			this.NextScene();
 
-			this.scene.Initialize();
-
 			base.Initialize();
 
 		}
@@ -45,11 +43,10 @@ namespace Humper.Sample.Basic
 			typeof(TopdownScene),
 			typeof(PlatformerScene),
 			typeof(ParticlesScene),
+			typeof(PreviewScene),
 		};
 
 		private int sceneIndex = -1;
-
-		private SpriteFont font;
 
 		/// <summary>
 		/// LoadContent will be called once per game and is the place to load
@@ -59,14 +56,13 @@ namespace Humper.Sample.Basic
 		{
 			// Create a new SpriteBatch, which can be used to draw textures.
 			spriteBatch = new SpriteBatch(GraphicsDevice);
-
-			this.font = this.Content.Load<SpriteFont>("font");
 		}
 
 		private void NextScene()
 		{
 			this.sceneIndex = (this.sceneIndex + 1) % this.scenes.Length;
 			this.scene = (IScene) Activator.CreateInstance(this.scenes[this.sceneIndex]);
+			this.scene.LoadContent(this.Content);
 			this.scene.Initialize();
 		}
 
@@ -94,36 +90,7 @@ namespace Humper.Sample.Basic
 			base.Update(gameTime);
 		}
 
-		private void DrawCell(int x, int y, int w, int h, float alpha)
-		{
-			if(Keyboard.GetState().IsKeyDown(Keys.Space))
-				spriteBatch.DrawStroke(new Rectangle(x,y,w,h), new Color(Color.White, alpha));
-		}
 
-		private void DrawBox(IBox box)
-		{
-			Color color;
-
-			if (box.HasTag(Tags.Group1))
-				color = Color.White;
-			else if (box.HasTag(Tags.Group3))
-				color = Color.Red;
-			else if (box.HasTag(Tags.Group4))
-				color = Color.Green;
-			else if (box.HasTag(Tags.Group5))
-				color = Color.Yellow;
-			else
-				color = new Color(165, 155, 250);
-
-			spriteBatch.Draw(box.Bounds, color, 0.3f);
-		}
-
-		private void DrawString(string message, int x, int y, float alpha)
-		{
-			var size = this.font.MeasureString(message);
-			if (Keyboard.GetState().IsKeyDown(Keys.Space))
-				spriteBatch.DrawString(this.font, message, new Vector2( x - size.X / 2, y - size.Y / 2), new Color(Color.White, alpha));
-		}
 
 		/// <summary>
 		/// This is called when the game should draw itself.
@@ -135,9 +102,7 @@ namespace Humper.Sample.Basic
 
 			spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
 
-			var b = this.scene.World.Bounds;
-
-			this.scene.World.DrawDebug((int)b.X, (int)b.Y, (int)b.Width, (int)b.Height, DrawCell, DrawBox, DrawString);
+			this.scene.Draw(spriteBatch);
 
 			spriteBatch.End();
 

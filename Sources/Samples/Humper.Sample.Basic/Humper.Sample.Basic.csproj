@@ -46,6 +46,8 @@
     <Compile Include="Scenes\PlatformerScene.cs" />
     <Compile Include="Tags.cs" />
     <Compile Include="Scenes\ParticlesScene.cs" />
+    <Compile Include="Scenes\PreviewScene.cs" />
+    <Compile Include="Scenes\WorldScene.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Icon.png" />

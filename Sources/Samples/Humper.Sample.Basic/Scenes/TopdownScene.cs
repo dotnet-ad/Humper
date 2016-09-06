@@ -5,17 +5,15 @@
 	using Microsoft.Xna.Framework;
 	using Microsoft.Xna.Framework.Input;
 
-	public class TopdownScene : IScene
+	public class TopdownScene : WorldScene
 	{
 		public TopdownScene()
 		{
 		}
 
-		public World World { get; private set; }
-
 		private IBox player1, player2;
 
-		public void Initialize()
+		public override void Initialize()
 		{
 			this.World = new World(1024, 700);
 
@@ -28,7 +26,7 @@
 			this.World.Create(190, 20, 80, 400).AddTags(Tags.Group2);
 		}
 
-		public void Update(GameTime time)
+		public override void Update(GameTime time)
 		{
 			var delta = (float)time.ElapsedGameTime.TotalMilliseconds;
 
@@ -53,6 +51,7 @@
 			var move = player.Move(player.X + delta * velocity.X, player.Y + delta * velocity.Y, (collision) => CollisionResponses.Slide);
 
 		}
+
 	}
 }
 

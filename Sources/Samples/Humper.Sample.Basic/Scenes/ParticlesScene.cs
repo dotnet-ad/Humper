@@ -7,7 +7,7 @@
 	using System.Linq;
 	using System.Collections.Generic;
 
-	public class ParticlesScene : IScene
+	public class ParticlesScene : WorldScene
 	{
 		public class Particle
 		{
@@ -50,13 +50,11 @@
 		{
 		}
 
-		public World World { get; private set; }
-
 		private IBox player1;
 
 		private Vector2 platformVelocity = Vector2.UnitX * 0.05f;
 
-		public void Initialize()
+		public override void Initialize()
 		{
 			this.World = new World(1024, 700);
 
@@ -87,7 +85,7 @@
 			this.velocity = Vector2.Zero;
 		}
 
-		public void Update(GameTime time)
+		public override void Update(GameTime time)
 		{
 			var delta = (float)time.ElapsedGameTime.TotalMilliseconds;
 
