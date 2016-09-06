@@ -18,7 +18,7 @@ namespace Humper.Sample.Basic
 
 		private SpriteFont font;
 
-		public void Draw(SpriteBatch sb)
+		public virtual void Draw(SpriteBatch sb)
 		{
 			var b = this.World.Bounds;
 			this.spriteBatch = sb;

@@ -314,8 +314,7 @@
 				(entry.X < 0.0f && (origin.X < other.Left || origin.X > other.Right)) ||
 				entry.Y < 0.0f && (origin.Y < other.Top || origin.Y > other.Bottom))
 				return null;
-
-
+			
 			var result = new Hit()
 			{
 				Amount = entryTime,
@@ -330,10 +329,10 @@
 		{
 			if (entry.X > entry.Y)
 			{
-				return (invEntry.X <= 0.0f) ? Vector2.UnitX : -Vector2.UnitX;
+				return (invEntry.X < 0.0f) || (Math.Abs(invEntry.X) < Constants.Threshold && invExit.X < 0) ? Vector2.UnitX : -Vector2.UnitX;
 			}
 
-			return (invEntry.Y <= 0.0f) ? Vector2.UnitY : -Vector2.UnitY;
+			return (invEntry.Y < 0.0f || (Math.Abs(invEntry.Y) < Constants.Threshold && invExit.Y < 0)) ? Vector2.UnitY : -Vector2.UnitY;
 		}
 				                            
 
