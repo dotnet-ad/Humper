@@ -28,6 +28,11 @@
 				this.children.Add(box);
 			}
 
+			public bool Contains(IBox box)
+			{
+				return this.children.Contains(box);
+			}
+
 			public bool Remove(IBox box)
 			{
 				return this.children.Remove(box);
@@ -108,7 +113,8 @@
 
 			foreach (var cell in cells)
 			{
-				cell.Add(box);
+				if(!cell.Contains(box))
+					cell.Add(box);
 			}
 		}
 
