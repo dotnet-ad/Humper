@@ -161,10 +161,31 @@ When moving a box, a response should be returned through a filter to indicate ho
 
 Several responses are included :
 
-* `Touch`: the box moves to the collision impact position.
-* `Cross`: the box moves through and ignore collision.
-* `Slide`: the box slides on the collided side of the other box.
-* `Bounce`: the box is reflected from the side of the other box.
+#### `Touch`
+
+![Schema](./Documentation/Touch.png)
+
+The box moves to the collision impact position.
+
+#### `Cross`
+
+![Schema](./Documentation/Cross.png)
+
+The box moves through and ignore collision.
+
+#### `Slide`
+
+![Schema](./Documentation/Slide.png)
+
+The box slides on the collided side of the other box.
+
+#### `Bounce`
+
+![Schema](./Documentation/Bounce.png)
+
+The box is reflected from the side of the other box.
+
+#### `Custom`
 
 A custom implementation of `ICollisionResponse` can also be provided if needed.
 
