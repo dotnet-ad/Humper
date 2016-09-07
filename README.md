@@ -139,6 +139,10 @@ Gets information about the impact point.
 
 An hit point represents the impact with a box of the world.
 
+#### `IBox Box { get; }`
+		
+Gets the collided box.
+
 #### `Vector2 Normal { get; set; }`
 
 The normal vector of the collided box side.

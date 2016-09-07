@@ -13,6 +13,8 @@
 		void Update(GameTime time);
 
 		void Draw(SpriteBatch sb);
+
+		string Message { get; }
 	}
 }
 
