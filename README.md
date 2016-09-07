@@ -159,7 +159,13 @@ The amount of movement needed from impact position to get the requested initial 
 
 When moving a box, a response should be returned through a filter to indicate how this box should react to a collision with another box.
 
-Several responses are included :
+Several `CollisionResponses` are included :
+
+#### `None`
+
+![Schema](./Documentation/None.png)
+
+All collisions are ignored.
 
 #### `Touch`
 
