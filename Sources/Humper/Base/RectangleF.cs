@@ -415,8 +415,10 @@ namespace Humper.Base
 		/// <param name="result">The union of the two rectangles as an output parameter.</param>
 		public static void Union(ref RectangleF value1, ref RectangleF value2, out RectangleF result)
 		{
-			result.X = Math.Min(value1.X, value2.X);
-			result.Y = Math.Min(value1.Y, value2.Y);
+			result = new RectangleF {
+				X = Math.Min(value1.X, value2.X),
+				Y = Math.Min(value1.Y, value2.Y)
+			};
 			result.Width = Math.Max(value1.Right, value2.Right) - result.X;
 			result.Height = Math.Max(value1.Bottom, value2.Bottom) - result.Y;
 		}
