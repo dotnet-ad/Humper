@@ -20,7 +20,7 @@
 
 		#region Boxes
 
-		private Grid grid;
+		protected Grid grid;
 
 		public IBox Create(float x, float y, float width, float height)
 		{
