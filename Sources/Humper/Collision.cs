@@ -10,13 +10,13 @@ namespace Humper
 
 		public IBox Box { get; set; }
 
-		public IBox Other { get; set; }
+		public IBox Other { get { return this.Hit?.Box; } }
 
 		public RectangleF Origin { get; set; }
 
 		public RectangleF Goal { get; set; }
 
-		public Hit Hit { get; set; }
+		public IHit Hit { get; set; }
 
 		public bool HasCollided => this.Hit != null;
 	}

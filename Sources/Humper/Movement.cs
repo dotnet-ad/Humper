@@ -8,17 +8,16 @@
 	{
 		public Movement()
 		{
-			this.Collisions = new ICollision[0];
+			this.Hits = new IHit[0];
 		}
 
-		public IEnumerable<ICollision> Collisions { get; set; }
+		public IEnumerable<IHit> Hits { get; set; }
 
-		public bool HasCollided { get { return this.Collisions.Any((cw) => cw.HasCollided); } }
+		public bool HasCollided { get { return this.Hits.Any(); } }
 
 		public RectangleF Origin { get; set; }
 
 		public RectangleF Destination { get; set; }
-
 	}
 }
 

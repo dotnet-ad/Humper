@@ -8,6 +8,53 @@
 
 	public class PlatformerScene : IScene
 	{
+		public class Crate
+		{
+			public Crate(IBox box)
+			{
+				this.box = box.AddTags(Tags.Group5);
+				this.box.Data = this;
+			}
+
+			private IBox box;
+
+			public Vector2 velocity;
+
+			private bool inWater;
+
+			public void Update(float delta)
+			{
+				velocity.Y += delta * 0.001f;
+
+
+				if (inWater)
+					velocity.Y *= 0.5f;
+
+				var move = box.Move(box.X + delta * velocity.X, box.Y + delta * velocity.Y, (collision) =>
+				{
+					if (collision.Other.HasTag(Tags.Group3))
+					{
+						return CollisionResponses.Cross;
+					}
+
+					return CollisionResponses.Slide;
+				});
+
+				inWater = (move.Hits.Any((c) => c.Box.HasTag(Tags.Group3)));
+
+
+				velocity.X *= 0.85f;
+
+				// Testing if on ground
+				if (move.Hits.Any((c) => c.Box.HasTag(Tags.Group2) && (c.Normal.Y < 0)))
+				{
+					velocity.Y = 0;
+					velocity.X *= 0.85f;
+				}
+
+			}
+		}
+
 		public PlatformerScene()
 		{
 		}
@@ -15,6 +62,8 @@
 		public World World { get; private set; }
 
 		private IBox player1, platform;
+
+		private Crate[] crates;
 
 		private Vector2 platformVelocity = Vector2.UnitX * 0.05f;
 
@@ -25,6 +74,12 @@
 			this.SpawnPlayer();
 
 			this.platform = this.World.Create(0, 200, 100, 20).AddTags(Tags.Group4);
+
+			this.crates = new[]
+			{
+				new Crate(this.World.Create(150, 220, 40, 40)),
+				new Crate(this.World.Create(210, 220, 40, 40)),
+			};
 
 			// Map
 			this.World.Create(0, 300, 400, 20).AddTags(Tags.Group2);
@@ -51,6 +106,12 @@
 			var delta = (float)time.ElapsedGameTime.TotalMilliseconds;
 
 			UpdatePlatform(this.platform, delta);
+			 
+			foreach (var crate in crates)
+			{
+				crate.Update(delta);
+			}
+
 			UpdatePlayer(this.player1, delta, Keys.Left, Keys.Up, Keys.Right, Keys.Down);
 		}
 
@@ -100,16 +161,24 @@
 			});
 
 			// Testing if on moving platform
-			onPlatform = move.Collisions.Any((c) => c.Other.HasTag(Tags.Group4));
+			onPlatform = move.Hits.Any((c) => c.Box.HasTag(Tags.Group4));
 
 			// Testing if on ground
-			if (move.Collisions.Any((c) => c.Other.HasTag(Tags.Group4, Tags.Group2) && (c.Hit.Normal.Y < 0)))
+			if (move.Hits.Any((c) => c.Box.HasTag(Tags.Group4, Tags.Group2, Tags.Group5) && (c.Normal.Y < 0)))
 			{
 				velocity.Y = 0;
 			}
 
+			var pushedCrateCollision = move.Hits.FirstOrDefault((c) => c.Box.HasTag(Tags.Group5));
+			if (pushedCrateCollision != null)
+			{
+				var pushedCrate = pushedCrateCollision.Box.Data as Crate;
+				var n = pushedCrateCollision.Normal;
+				pushedCrate.velocity = new Vector2(n.X * n.X,n.Y * n.Y) * velocity;
+			}
+
 			// Testing if in red water
-			if (move.Collisions.Any((c) => c.Other.HasTag(Tags.Group3)))
+			if (move.Hits.Any((c) => c.Box.HasTag(Tags.Group3)))
 			{
 				timeInRed += delta;
 				if (timeInRed > 3000)
@@ -119,6 +188,8 @@
 			{
 				timeInRed = 0;
 			}
+
+			player.Data = velocity;
 
 			state = k;
 		}

@@ -3,7 +3,7 @@
 	using System;
 	using Base;
 
-	public class Hit
+	public class Hit : IHit
 	{
 		public Hit()
 		{
@@ -11,25 +11,107 @@
 			this.Amount = 1.0f;
 		}
 
+		public IBox Box { get; set; }
+
 		public Vector2 Normal { get; set; }
 
 		public float Amount { get; set; }
 
-		public RectangleF Position { get; set; }
+		public Vector2 Position { get; set; }
 
 		public float Remaining { get { return 1.0f - this.Amount; } }
 
-		public static Hit ResolveWithBroadphasing(RectangleF origin, RectangleF destination, RectangleF other)
+		#region Public functions
+
+		public static IHit Resolve(RectangleF origin, RectangleF destination, IBox other)
+		{
+			var result = Resolve(origin,destination, other.Bounds);
+			if (result != null) result.Box = other;
+			return result;
+		}
+
+		private static Hit Resolve(RectangleF origin, RectangleF destination, RectangleF other)
 		{
 			var broadphaseArea = new RectangleF(origin,destination);
 
 			if (broadphaseArea.Intersects(other) || broadphaseArea.Contains(other))
 			{
-				return Resolve(origin, destination, other);
+				return ResolveNarrow(origin, destination, other);
 			}
 
 			return null;
 		}
+
+		public static IHit Resolve(Vector2 origin, Vector2 destination, IBox other)
+		{
+			var result = Resolve(origin, destination, other.Bounds);
+			if (result != null) result.Box = other;
+			return result;
+		}
+
+		private static Hit Resolve(Vector2 origin, Vector2 destination, RectangleF other)
+		{
+			// Liang-Barsky algorithm : https://gist.github.com/ChickenProp/3194723
+			var velocity = destination - origin;
+			var p = new[] { -velocity.X, velocity.X, -velocity.Y, velocity.Y };
+			var q = new[] { origin.X - other.Left, other.Right - origin.X, origin.Y - other.Top, other.Bottom - origin.Y };
+			var u1 = float.MinValue;
+			var u2 = float.MaxValue;
+
+			for (int i = 0; i < 4; i++)
+			{
+				if (Math.Abs(p[i]) < Constants.Threshold)
+				{
+					if (q[i] < 0)
+					{
+						return null;
+					}
+				}
+				else
+				{
+					var t = q[i] / p[i];
+					if (p[i] < 0 && u1 < t)
+					{
+						u1 = t;
+					}
+					else if (p[i] > 0 && u2 > t)
+					{
+						u2 = t;
+					}
+				}
+			}
+
+			if (u1 > u2 || u1 > 1 || u1 < 0)
+			{
+				return null;
+			}
+
+			// TODO add normal
+
+			return new Hit()
+			{
+				Amount = u1,
+				Position = new Vector2(origin.X + u1 * velocity.X, origin.Y + u1 * velocity.Y),
+			};
+		}
+
+		public static IHit Resolve(Vector2 point, IBox other)
+		{
+			// TODO add normal and nearest point on rectangle sides
+			if (other.Bounds.Contains(point))
+			{
+				return new Hit()
+				{
+					Amount = 0,
+					Box = other,
+					Position = point,
+				};
+			}
+
+			return null;
+		}
+
+		#endregion
 
 		private static RectangleF PushOutside(RectangleF origin, RectangleF other)
 		{
@@ -43,22 +125,22 @@
 
 			var min = Math.Min(top, Math.Min(bottom, Math.Min(right, left)));
 
-			if (min == top)
+			if (Math.Abs(min - top) < Constants.Threshold)
 			{
 				normal = -Vector2.UnitY;
 				position.Location = new Vector2(position.Location.X, other.Top - position.Height);
 			}
-			else if (min == bottom)
+			else if (Math.Abs(min - bottom) < Constants.Threshold)
 			{
 				normal = Vector2.UnitY;
 				position.Location = new Vector2(position.Location.X, other.Bottom);
 			}
-			else if (min == left)
+			else if (Math.Abs(min - left) < Constants.Threshold)
 			{
 				normal = -Vector2.UnitX;
 				position.Location = new Vector2(other.Left - position.Width, position.Location.Y);
 			}
-			else if (min == right)
+			else if (Math.Abs(min - right) < Constants.Threshold)
 			{
 				normal = Vector2.UnitX;
 				position.Location = new Vector2(other.Right, position.Location.Y);
@@ -67,7 +149,7 @@
 			return position;
 		}
 
-		private static Hit Resolve(RectangleF origin, RectangleF destination, RectangleF other)
+		private static Hit ResolveNarrow(RectangleF origin, RectangleF destination, RectangleF other)
 		{
 			// if starts inside, push it outside at the neareast place
 			if (other.Contains(origin) || other.Intersects(origin))
@@ -76,6 +158,7 @@
 			}
 
 			var velocity = (destination.Location - origin.Location);
+
 			Vector2 invEntry, invExit, entry, exit;
 
 			if (velocity.X > 0)
@@ -100,7 +183,7 @@
 				invExit.Y = other.Top - origin.Bottom;
 			}
 
-			if (Math.Abs(velocity.X) < Constants.Epsilon)
+			if (Math.Abs(velocity.X) < Constants.Threshold)
 			{
 				entry.X = float.MinValue;
 				exit.X = float.MaxValue;
@@ -111,7 +194,7 @@
 				exit.X = invExit.X / velocity.X;
 			}
 
-			if (Math.Abs(velocity.Y) < Constants.Epsilon)
+			if (Math.Abs(velocity.Y) < Constants.Threshold)
 			{
 				entry.Y = float.MinValue;
 				exit.Y = float.MaxValue;
@@ -138,7 +221,7 @@
 			var result = new Hit()
 			{
 				Amount = entryTime,
-				Position = new RectangleF(origin.Location + velocity * entryTime, origin.Size),
+				Position = origin.Location + velocity * entryTime,
 			};
 
 			// Calculate normal of collided surface
@@ -168,6 +251,22 @@
 			return result;
 		}
 
+		public bool IsNearest(IHit than, Vector2 origin)
+		{
+			if (this.Amount < than.Amount)
+			{
+				return true;
+			}
+			else if (this.Amount > than.Amount)
+			{
+				return true;
+			}
+
+			var thisDistance = (origin - this.Position).LengthSquared();
+			var otherDistance = (origin - than.Position).LengthSquared();
+
+			return thisDistance < otherDistance;
+		}
 	}
 }
 

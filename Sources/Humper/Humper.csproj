@@ -51,6 +51,8 @@
     <Compile Include="Responses\CollisionResponse.cs" />
     <Compile Include="ICollision.cs" />
     <Compile Include="IMovement.cs" />
+    <Compile Include="IHit.cs" />
+    <Compile Include="IWorld.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Base\" />

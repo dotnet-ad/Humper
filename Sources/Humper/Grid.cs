@@ -67,8 +67,11 @@
 			var minY = (int)(y / this.CellSize);
 			var maxX = (int)((x + w - 1) / this.CellSize);
 			var maxY = (int)((y + h - 1) / this.CellSize);
-			if (minX < 0 || minY < 0 || maxX >= this.Columns || maxY >= this.Rows)
-				throw new ArgumentException("Requested area is outside of the world");
+
+			minX = Math.Max(0, minX);
+			minY = Math.Max(0, minY);
+			maxX = Math.Min(this.Columns - 1, maxX);
+			maxY = Math.Min(this.Rows - 1, maxY);
 
 			List<Cell> result = new List<Cell>();
 
