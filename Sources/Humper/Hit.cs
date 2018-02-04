@@ -39,7 +39,7 @@
 
 		private static Hit Resolve(RectangleF origin, RectangleF destination, RectangleF other)
 		{
-			var broadphaseArea = new RectangleF(origin,destination);
+			var broadphaseArea = RectangleF.Union(origin,destination);
 
 			if (broadphaseArea.Intersects(other) || broadphaseArea.Contains(other))
 			{

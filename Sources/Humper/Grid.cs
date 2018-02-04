@@ -70,8 +70,8 @@
 		{
 			var minX = (int)(x / this.CellSize);
 			var minY = (int)(y / this.CellSize);
-			var maxX = (int)((x + w - 1) / this.CellSize);
-			var maxY = (int)((y + h - 1) / this.CellSize);
+			var maxX = (int)((x + w - 1) / this.CellSize) + 1;
+			var maxY = (int)((y + h - 1) / this.CellSize) + 1;
 
 			minX = Math.Max(0, minX);
 			minY = Math.Max(0, minY);
