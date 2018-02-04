@@ -6,7 +6,7 @@
 	using Microsoft.Xna.Framework.Input;
 	using System.Linq;
 
-	public class PlatformerScene : IScene
+	public class PlatformerScene : WorldScene
 	{
 		public class Crate
 		{
@@ -59,15 +59,13 @@
 		{
 		}
 
-		public World World { get; private set; }
-
 		private IBox player1, platform;
 
 		private Crate[] crates;
 
 		private Vector2 platformVelocity = Vector2.UnitX * 0.05f;
 
-		public void Initialize()
+		public override void Initialize()
 		{
 			this.World = new World(1024, 700);
 
@@ -101,7 +99,7 @@
 			this.velocity = Vector2.Zero;
 		}
 
-		public void Update(GameTime time)
+		public override void Update(GameTime time)
 		{
 			var delta = (float)time.ElapsedGameTime.TotalMilliseconds;
 
