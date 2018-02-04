@@ -16,9 +16,9 @@
 
 		RectangleF Bounds { get; }
 
-		Movement Move(float x, float y, Func<ICollision, ICollisionResponse> filter);
+		IMovement Move(float x, float y, Func<ICollision, ICollisionResponse> filter);
 
-		Movement Move(float x, float y, Func<ICollision, CollisionResponses> filter);
+		IMovement Move(float x, float y, Func<ICollision, CollisionResponses> filter);
 
 		object Data { get; set; }
 
