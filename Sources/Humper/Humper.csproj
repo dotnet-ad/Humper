@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1DD7D455-8710-44A5-B275-8606EB78D80E}</ProjectGuid>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <UseMSBuildEngine>true</UseMSBuildEngine>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Humper</RootNamespace>
+    <AssemblyName>Humper</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Profile78</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="World.cs" />
+    <Compile Include="Box.cs" />
+    <Compile Include="Hit.cs" />
+    <Compile Include="Base\Vector2.cs" />
+    <Compile Include="Collision.cs" />
+    <Compile Include="Base\RectangleF.cs" />
+    <Compile Include="Responses\ICollisionResponse.cs" />
+    <Compile Include="Responses\TouchResponse.cs" />
+    <Compile Include="Responses\CollisionResponses.cs" />
+    <Compile Include="Movement.cs" />
+    <Compile Include="Responses\SlideResponse.cs" />
+    <Compile Include="Responses\BounceResponse.cs" />
+    <Compile Include="Base\Maths.cs" />
+    <Compile Include="IBox.cs" />
+    <Compile Include="Grid.cs" />
+    <Compile Include="Base\Constants.cs" />
+    <Compile Include="Responses\CrossResponse.cs" />
+    <Compile Include="Responses\CollisionResponse.cs" />
+    <Compile Include="ICollision.cs" />
+    <Compile Include="IMovement.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Base\" />
+    <Folder Include="Responses\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+</Project>

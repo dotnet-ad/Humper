@@ -1,0 +1,28 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Humper", "Humper\Humper.csproj", "{1DD7D455-8710-44A5-B275-8606EB78D80E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{E8C67208-F5A9-4C71-9EFB-8A2E67F8191C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Humper.Sample.Basic", "Samples\Humper.Sample.Basic\Humper.Sample.Basic.csproj", "{9B583AE6-2DF2-41CD-945B-57B192C6503E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1DD7D455-8710-44A5-B275-8606EB78D80E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DD7D455-8710-44A5-B275-8606EB78D80E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DD7D455-8710-44A5-B275-8606EB78D80E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DD7D455-8710-44A5-B275-8606EB78D80E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B583AE6-2DF2-41CD-945B-57B192C6503E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B583AE6-2DF2-41CD-945B-57B192C6503E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B583AE6-2DF2-41CD-945B-57B192C6503E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B583AE6-2DF2-41CD-945B-57B192C6503E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9B583AE6-2DF2-41CD-945B-57B192C6503E} = {E8C67208-F5A9-4C71-9EFB-8A2E67F8191C}
+	EndGlobalSection
+EndGlobal
