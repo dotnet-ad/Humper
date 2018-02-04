@@ -14,6 +14,14 @@ namespace Humper.Sample.Basic
 
 		protected World World { get; set; }
 		 
+		public virtual string Message
+		{
+			get
+			{
+				return $"[Up,Right,Down,Left]: move\n[Space]: show grid";
+			} 
+		}
+
 		private SpriteBatch spriteBatch;
 
 		private SpriteFont font;

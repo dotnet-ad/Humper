@@ -26,12 +26,24 @@ namespace Humper.Sample.Basic
 
 		private RectangleF normal;
 
-		private bool moveDestination;
+		private bool moveDestination, isMoving;
+		private RectangleF cursor, selected;
 
 		private CollisionResponses[] values = Enum.GetValues(typeof(CollisionResponses)) as CollisionResponses[];
 		private int response = 0;
 
 		private KeyboardState previous;
+
+		public string Message 
+		{ 
+			get 
+			{
+				var moving = moveDestination ? nameof(goal) : nameof(origin);
+				var changed = !moveDestination ? nameof(goal) : nameof(origin);
+				var r = this.values[response];
+				return $"[N]: select {changed} box\n[Space]: move selected {moving} box\n[R]: Change collision mode ({r})";
+			}
+		}
 
 		public void Draw(SpriteBatch sb)
 		{
@@ -43,12 +55,15 @@ namespace Humper.Sample.Basic
 			sb.Draw(destination, color: Color.Green, fillOpacity: 0.0f);
 			var s = destination.Size / 10;
 			sb.Draw(new RectangleF(destination.Center - (s / 2), s), color: Color.Green, fillOpacity: 0.0f);
+			sb.Draw(cursor, color: Color.White, fillOpacity: 0.0f);
+			sb.Draw(selected, color: Color.White, fillOpacity: 0.5f);
 		}
 
 		public void Initialize()
 		{
 			this.origin = new RectangleF(0, 0, 100, 100);
 			this.goal = new RectangleF(400, 300, 100, 100);
+			this.selected = new RectangleF(-3, -3 , 6, 6);
 
 			this.other = new RectangleF(200, 200, 500, 120);
 		}
@@ -60,6 +75,7 @@ namespace Humper.Sample.Basic
 			if (previous.IsKeyUp(Keys.N) && state.IsKeyDown(Keys.N))
 			{
 				moveDestination = !moveDestination;
+				this.selected.Location = (moveDestination ? goal.Location : origin.Location) - this.selected.Size / 2;
 			}
 
 			if (previous.IsKeyUp(Keys.R) && state.IsKeyDown(Keys.R))
@@ -70,11 +86,17 @@ namespace Humper.Sample.Basic
 
 			previous = state;
 
-			if (state.IsKeyDown(Keys.Space))
-			{
-				var m = Mouse.GetState().Position;
-				var pos = new Base.Vector2(m.X, m.Y);
+			this.isMoving = state.IsKeyDown(Keys.Space);
+			var m = Mouse.GetState().Position;
+			var pos = new Base.Vector2(m.X, m.Y);
+			var size = isMoving ? 18 : 6;
+			this.cursor = new RectangleF(m.X - size/2, m.Y - size/2,size, size);
 
+
+			if (isMoving)
+			{
+				this.selected.Location = pos - this.selected.Size / 2;
+				
 				if (moveDestination)
 				{
 					this.goal.Location = pos;
@@ -95,14 +117,14 @@ namespace Humper.Sample.Basic
 				this.normal = new RectangleF(this.collision.Center + hit.Normal * 50, new Base.Vector2(5, 5));
 
 				// Destination
-				var collision = new Collision()
+				var collisionPoint = new Collision()
 				{
 					Origin = origin,
 					Goal = goal,
 					Hit = hit,
 				};
 
-				this.destination = CollisionResponse.Create(collision,r)?.Destination ?? goal;
+				this.destination = CollisionResponse.Create(collisionPoint,r)?.Destination ?? goal;
 			}
 			else
 			{

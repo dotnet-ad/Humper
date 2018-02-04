@@ -14,6 +14,7 @@ namespace Humper.Sample.Basic
 	{
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
+		private SpriteFont font;
 
 		public Game1()
 		{
@@ -56,6 +57,7 @@ namespace Humper.Sample.Basic
 		{
 			// Create a new SpriteBatch, which can be used to draw textures.
 			spriteBatch = new SpriteBatch(GraphicsDevice);
+			this.font = Content.Load<SpriteFont>("font");
 		}
 
 		private void NextScene()
@@ -103,6 +105,8 @@ namespace Humper.Sample.Basic
 			spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
 
 			this.scene.Draw(spriteBatch);
+
+			spriteBatch.DrawString(this.font, this.scene.Message, new Vector2(20, 20), new Color(Color.White, 0.5f));
 
 			spriteBatch.End();
 
