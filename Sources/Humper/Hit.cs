@@ -30,6 +30,13 @@
 			return result;
 		}
 
+		public static IHit Resolve(Vector2 origin, Vector2 destination, IBox other)
+		{
+			var result = Resolve(origin, destination, other.Bounds);
+			if (result != null) result.Box = other;
+			return result;
+		}
+
 		private static Hit Resolve(RectangleF origin, RectangleF destination, RectangleF other)
 		{
 			var broadphaseArea = new RectangleF(origin,destination);
@@ -42,69 +49,32 @@
 			return null;
 		}
 
-		public static IHit Resolve(Vector2 origin, Vector2 destination, IBox other)
-		{
-			var result = Resolve(origin, destination, other.Bounds);
-			if (result != null) result.Box = other;
-			return result;
-		}
-
 		private static Hit Resolve(Vector2 origin, Vector2 destination, RectangleF other)
 		{
-			// Liang-Barsky algorithm : https://gist.github.com/ChickenProp/3194723
-			var velocity = destination - origin;
-			var p = new[] { -velocity.X, velocity.X, -velocity.Y, velocity.Y };
-			var q = new[] { origin.X - other.Left, other.Right - origin.X, origin.Y - other.Top, other.Bottom - origin.Y };
-			var u1 = float.MinValue;
-			var u2 = float.MaxValue;
+			var min = Vector2.Min(origin,destination);
+			var size = Vector2.Max(origin, destination) - min;
 
-			for (int i = 0; i < 4; i++)
+			var broadphaseArea = new RectangleF(min, size);
+
+			if (broadphaseArea.Intersects(other) || broadphaseArea.Contains(other))
 			{
-				if (Math.Abs(p[i]) < Constants.Threshold)
-				{
-					if (q[i] < 0)
-					{
-						return null;
-					}
-				}
-				else
-				{
-					var t = q[i] / p[i];
-					if (p[i] < 0 && u1 < t)
-					{
-						u1 = t;
-					}
-					else if (p[i] > 0 && u2 > t)
-					{
-						u2 = t;
-					}
-				}
+				return ResolveNarrow(origin, destination, other);
 			}
 
-			if (u1 > u2 || u1 > 1 || u1 < 0)
-			{
-				return null;
-			}
-
-			// TODO add normal
-
-			return new Hit()
-			{
-				Amount = u1,
-				Position = new Vector2(origin.X + u1 * velocity.X, origin.Y + u1 * velocity.Y),
-			};
+			return null;
 		}
 
 		public static IHit Resolve(Vector2 point, IBox other)
 		{
-			// TODO add normal and nearest point on rectangle sides
 			if (other.Bounds.Contains(point))
 			{
+				var outside = PushOutside(point, other.Bounds);
 				return new Hit()
 				{
 					Amount = 0,
 					Box = other,
-					Position = point,
+					Position = outside.Item1,
+					Normal = outside.Item2,
 				};
 			}
 
@@ -113,7 +83,43 @@
 
 		#endregion
 
-		private static RectangleF PushOutside(RectangleF origin, RectangleF other)
+		private static Tuple<Vector2, Vector2> PushOutside(Vector2 origin, RectangleF other)
+		{
+			var position = origin;
+			var normal = Vector2.Zero;
+
+			var top = origin.Y - other.Top;
+			var bottom = other.Bottom - origin.Y;
+			var left = origin.X - other.Left;
+			var right = other.Right - origin.X;
+
+			var min = Math.Min(top, Math.Min(bottom, Math.Min(right, left)));
+
+			if (Math.Abs(min - top) < Constants.Threshold)
+			{
+				normal = -Vector2.UnitY;
+				position = new Vector2(position.X, other.Top);
+			}
+			else if (Math.Abs(min - bottom) < Constants.Threshold)
+			{
+				normal = Vector2.UnitY;
+				position = new Vector2(position.X, other.Bottom);
+			}
+			else if (Math.Abs(min - left) < Constants.Threshold)
+			{
+				normal = -Vector2.UnitX;
+				position = new Vector2(other.Left, position.Y);
+			}
+			else if (Math.Abs(min - right) < Constants.Threshold)
+			{
+				normal = Vector2.UnitX;
+				position = new Vector2(other.Right, position.Y);
+			}
+
+			return new Tuple<Vector2, Vector2>(position,normal);
+		}
+
+		private static Tuple<RectangleF,Vector2> PushOutside(RectangleF origin, RectangleF other)
 		{
 			var position = origin;
 			var normal = Vector2.Zero;
@@ -146,7 +152,7 @@
 				position.Location = new Vector2(other.Right, position.Location.Y);
 			}
 
-			return position;
+			return new Tuple<RectangleF, Vector2>(position,normal);
 		}
 
 		private static Hit ResolveNarrow(RectangleF origin, RectangleF destination, RectangleF other)
@@ -154,7 +160,7 @@
 			// if starts inside, push it outside at the neareast place
 			if (other.Contains(origin) || other.Intersects(origin))
 			{
-				origin = PushOutside(origin, other);
+				origin = PushOutside(origin, other).Item1;
 			}
 
 			var velocity = (destination.Location - origin.Location);
@@ -222,34 +228,101 @@
 			{
 				Amount = entryTime,
 				Position = origin.Location + velocity * entryTime,
+				Normal = GetNormal(invEntry, invExit, entry),
 			};
 
-			// Calculate normal of collided surface
-			if (entry.X > entry.Y)
-			{
-				if (invEntry.X < 0.0f)
-				{
-					result.Normal = Vector2.UnitX;
-				}
-				else
-				{
-					result.Normal = -Vector2.UnitX;
-				}
-			}
-			else
-			{
-				if (invEntry.Y < 0.0f)
-				{
-					result.Normal = Vector2.UnitY;
-				}
-				else
-				{
-					result.Normal = -Vector2.UnitY;
-				}
-			}
 
 			return result;
 		}
+		private static Hit ResolveNarrow(Vector2 origin, Vector2 destination, RectangleF other)
+		{
+			// if starts inside, push it outside at the neareast place
+			if (other.Contains(origin))
+			{
+				origin = PushOutside(origin, other).Item1;
+			}
+
+			var velocity = (destination - origin);
+
+			Vector2 invEntry, invExit, entry, exit;
+
+			if (velocity.X > 0)
+			{
+				invEntry.X = other.Left - origin.X;
+				invExit.X = other.Right - origin.X;
+			}
+			else
+			{
+				invEntry.X = other.Right - origin.X;
+				invExit.X = other.Left - origin.X;
+			}
+
+			if (velocity.Y > 0)
+			{
+				invEntry.Y = other.Top - origin.Y;
+				invExit.Y = other.Bottom - origin.Y;
+			}
+			else
+			{
+				invEntry.Y = other.Bottom - origin.Y;
+				invExit.Y = other.Top - origin.Y;
+			}
+
+			if (Math.Abs(velocity.X) < Constants.Threshold)
+			{
+				entry.X = float.MinValue;
+				exit.X = float.MaxValue;
+			}
+			else
+			{
+				entry.X = invEntry.X / velocity.X;
+				exit.X = invExit.X / velocity.X;
+			}
+
+			if (Math.Abs(velocity.Y) < Constants.Threshold)
+			{
+				entry.Y = float.MinValue;
+				exit.Y = float.MaxValue;
+			}
+			else
+			{
+				entry.Y = invEntry.Y / velocity.Y;
+				exit.Y = invExit.Y / velocity.Y;
+			}
+
+			if (entry.Y > 1.0f) entry.Y = float.MinValue;
+			if (entry.X > 1.0f) entry.X = float.MinValue;
+
+			var entryTime = Math.Max(entry.X, entry.Y);
+			var exitTime = Math.Min(exit.X, exit.Y);
+
+			if (
+				(entryTime > exitTime || entry.X < 0.0f && entry.Y < 0.0f) ||
+				(entry.X < 0.0f && (origin.X < other.Left || origin.X > other.Right)) ||
+				entry.Y < 0.0f && (origin.Y < other.Top || origin.Y > other.Bottom))
+				return null;
+
+
+			var result = new Hit()
+			{
+				Amount = entryTime,
+				Position = origin + velocity * entryTime,
+				Normal = GetNormal(invEntry, invExit, entry),
+			};
+
+			return result;
+		}
+
+		private static Vector2 GetNormal(Vector2 invEntry, Vector2 invExit, Vector2 entry)
+		{
+			if (entry.X > entry.Y)
+			{
+				return (invEntry.X < 0.0f) ? Vector2.UnitX : -Vector2.UnitX;
+			}
+
+			return (invEntry.Y < 0.0f) ? Vector2.UnitY : -Vector2.UnitY;
+		}
+				                            
 
 		public bool IsNearest(IHit than, Vector2 origin)
 		{
