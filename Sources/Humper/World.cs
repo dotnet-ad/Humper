@@ -145,6 +145,7 @@
 			var result = new Movement()
 			{
 				Origin = origin,
+				Goal = destination,
 				Destination = this.Simulate(hits, new List<IBox>() { box }, box, origin, destination, filter),
 				Hits = hits,
 			};

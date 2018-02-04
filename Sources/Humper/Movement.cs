@@ -18,6 +18,8 @@
 		public RectangleF Origin { get; set; }
 
 		public RectangleF Destination { get; set; }
+
+		public RectangleF Goal { get; set; }
 	}
 }
 
