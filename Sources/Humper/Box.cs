@@ -53,13 +53,12 @@
 
 		public IMovement Simulate(float x, float y, Func<ICollision, CollisionResponses> filter)
 		{
-			return Move(x, y, (col) =>
-			  {
+			return world.Simulate(this, x, y, (col) =>
+			{
 				if (col.Hit == null)
-					  return null;
-
-				  return CollisionResponse.Create(col, filter(col));
-			  });
+					return null;
+				return CollisionResponse.Create(col, filter(col));
+			});
 		}
 
 		public IMovement Move(float x, float y, Func<ICollision, ICollisionResponse> filter)

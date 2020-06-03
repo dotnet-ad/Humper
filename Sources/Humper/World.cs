@@ -135,7 +135,7 @@
 
 		#region Movements
 
-		public IMovement Simulate(Box box, float x, float y, Func<ICollision, ICollisionResponse> filter)
+		public IMovement Simulate(IBox box, float x, float y, Func<ICollision, ICollisionResponse> filter)
 		{
 			var origin = box.Bounds;
 			var destination = new RectangleF(x, y, box.Width, box.Height);
@@ -153,7 +153,7 @@
 			return result;
 		}
 
-		private RectangleF Simulate(List<IHit> hits, List<IBox> ignoring, Box box, RectangleF origin, RectangleF destination, Func<ICollision, ICollisionResponse> filter)
+		private RectangleF Simulate(List<IHit> hits, List<IBox> ignoring, IBox box, RectangleF origin, RectangleF destination, Func<ICollision, ICollisionResponse> filter)
 		{
 			var nearest = this.Hit(origin, destination, ignoring);
 				
