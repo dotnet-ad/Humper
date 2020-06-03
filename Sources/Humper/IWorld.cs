@@ -91,7 +91,7 @@
 		/// <param name="x">The x coordinate.</param>
 		/// <param name="y">The y coordinate.</param>
 		/// <param name="filter">Filter.</param>
-		IMovement Simulate(Box box, float x, float y, Func<ICollision, ICollisionResponse> filter);
+		IMovement Simulate(IBox box, float x, float y, Func<ICollision, ICollisionResponse> filter);
 
 		#endregion
 
