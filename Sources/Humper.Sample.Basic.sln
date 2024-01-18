@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34408.163
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Humper.Sample.Basic", "Samples\Humper.Sample.Basic\Humper.Sample.Basic.csproj", "{16D93BD4-32B8-4F03-A2DE-C5E2363FE53F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Humper", "Humper\Humper.csproj", "{E2801FFC-21F8-49B7-90F1-636A35530214}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{16D93BD4-32B8-4F03-A2DE-C5E2363FE53F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16D93BD4-32B8-4F03-A2DE-C5E2363FE53F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16D93BD4-32B8-4F03-A2DE-C5E2363FE53F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16D93BD4-32B8-4F03-A2DE-C5E2363FE53F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2801FFC-21F8-49B7-90F1-636A35530214}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2801FFC-21F8-49B7-90F1-636A35530214}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2801FFC-21F8-49B7-90F1-636A35530214}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2801FFC-21F8-49B7-90F1-636A35530214}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6560ACDB-E8BD-47B0-9F75-E341457B835E}
+	EndGlobalSection
+EndGlobal
